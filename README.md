@@ -1,5 +1,7 @@
 # 囧(go_away)小游戏
 
+[用 `pygame` 开发的小游戏, 欢迎加入开发](https://github.com/aaron20100919/go_away.git)
+
 ### 准备
 
 首先你得有 `python` 并确保有 `pygame` 库
