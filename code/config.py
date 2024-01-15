@@ -1,5 +1,4 @@
 import os, time
-from pygame.locals import *
 
 screen_size = 200, 160
 bg_color = 0, 0, 0
@@ -17,5 +16,6 @@ you_image = work_tree + "../img/you.png"
 wall_image = work_tree + "../img/wall.png"
 flag_image = work_tree + "../img/flag.png"
 
+level = 3
 
 time_start = time.time()

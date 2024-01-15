@@ -3,8 +3,11 @@ import pygame
 import time
 import random
 import os
-from pygame.locals import *
 from config import *
+
+
+all_sprites = pygame.sprite.Group()
+walls = pygame.sprite.Group()
 
 
 def clear_callback(surf, rect):
@@ -28,27 +31,26 @@ class You(pygame.sprite.Sprite):
         keys = pygame.key.get_pressed()
         self.velocity_x = 0
 
-        if keys[K_a]:
+        if keys[pygame.K_a]:
             self.velocity_x = -velocity_x
-        if keys[K_d]:
+        if keys[pygame.K_d]:
             self.velocity_x = velocity_x
-        if keys[K_a] and keys[K_d]:
+        if keys[pygame.K_a] and keys[pygame.K_d]:
             self.velocity_x = 0
-        if keys[K_SPACE]:
+        if keys[pygame.K_SPACE]:
             if self.velocity_x:
                 self.velocity_x = self.velocity_x / velocity_x
-        if keys[K_r]:
+        if keys[pygame.K_r]:
             self.rect.bottomleft = 0, screen_size[1]
 
-        self.rect.x += self.velocity_x
-
         if self.on_ground:
-            if keys[K_w]:
+            if keys[pygame.K_w]:
                 self.velocity_y = -velocity_y
                 self.on_ground = False
 
         self.velocity_y += g
-        self.rect.y += self.velocity_y
+        self.rect.y = int(self.rect.y + self.velocity_y)
+        self.rect.x = int(self.rect.x + self.velocity_x)
 
         wall_collision = pygame.sprite.spritecollide(self, walls, False)
 
@@ -74,36 +76,6 @@ class You(pygame.sprite.Sprite):
                 self.rect.top = wall.rect.bottom
                 self.velocity_y = 0
 
-        # for wall in wall_collision:
-        #     if self.rect.bottom <= wall.rect.bottom < self.rect.top:
-        #         if self.velocity_x > 0:
-        #             if self.rect.right > wall.rect.left:
-        #                 self.rect.right = wall.rect.left
-        #         elif self.velocity_x < 0:
-        #             if self.rect.left < wall.rect.right:
-        #                 self.rect.left = wall.rect.right
-        #         continue
-
-        #     if self.velocity_y == 0:
-        #         if self.rect.bottom <= wall.rect.bottom < self.rect.top:
-        #             continue
-
-        #     if self.velocity_y == 0:
-        #         if wall.rect.bottom <= self.rect.bottom < wall.rect.top:
-        #             continue
-
-        #     if self.velocity_y > 0:
-        #         if self.rect.bottom > wall.rect.top:
-        #             self.rect.bottom = wall.rect.top
-        #             self.velocity_y = 0
-        #             self.on_ground = True
-
-        #     if self.velocity_y < 0:
-        #         if self.rect.top < wall.rect.bottom:
-        #             self.rect.top = wall.rect.bottom
-        #             self.velocity_y = 0
-        #             self.on_ground = False
-
         if self.rect.bottom > screen_size[1]:
             self.rect.bottom = screen_size[1]
             self.velocity_y = 0
@@ -119,6 +91,13 @@ class You(pygame.sprite.Sprite):
         if self.rect.left < 0:
             self.rect.left = 0
             self.velocity_x = 0
+
+
+you = You()
+all_sprites.add(you)
+
+you_group = pygame.sprite.Group()
+you_group.add(you)
 
 
 class Wall(pygame.sprite.Sprite):
@@ -142,7 +121,9 @@ class Flag(pygame.sprite.Sprite):
     def update(self):
         global time_start, time_elapsed
 
-        if pygame.sprite.spritecollide(self, [you], False, pygame.sprite.collide_rect):
+        if pygame.sprite.spritecollide(
+            self, you_group, False, pygame.sprite.collide_rect
+        ):
             time_elapsed = round(time.time() - time_start, 2)
             print(f"You win!!! Time taken: {time_elapsed} seconds")
             time.sleep(2)
@@ -150,11 +131,5 @@ class Flag(pygame.sprite.Sprite):
             sys.exit()
 
 
-all_sprites = pygame.sprite.Group()
-walls = pygame.sprite.Group()
-
-
-you = You()
-all_sprites.add(you)
 flag = Flag()
 all_sprites.add(flag)
